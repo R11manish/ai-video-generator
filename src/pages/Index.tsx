@@ -13,7 +13,7 @@ const Index = () => {
   }, []);
 
   return (
-    <div className="bg-black h-screen w-full overflow-hidden">
+    <div className="bg-black h-screen w-full max-w-md mx-auto overflow-hidden">
       <VideoFeed videos={mockVideos} />
     </div>
   );

@@ -2,6 +2,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { Video } from '@/types/video';
 import VideoPlayer from './VideoPlayer';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 interface VideoFeedProps {
   videos: Video[];
@@ -78,7 +79,7 @@ const VideoFeed = ({ videos }: VideoFeedProps) => {
   return (
     <div 
       ref={containerRef}
-      className="swipe-container hide-scrollbar overflow-y-scroll snap-y snap-mandatory"
+      className="h-screen w-full overflow-y-scroll hide-scrollbar snap-y snap-mandatory"
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}

@@ -1,8 +1,8 @@
-
 import { useState, useRef, useEffect } from 'react';
 import { Heart, MessageCircle, Share2 } from 'lucide-react';
 import { useVideoPlayer } from '@/hooks/useVideoPlayer';
 import { Video as VideoType } from '@/types/video';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 interface VideoPlayerProps {
   video: VideoType;
@@ -25,23 +25,22 @@ const VideoPlayer = ({ video, isInView }: VideoPlayerProps) => {
 
   return (
     <div className="relative h-full w-full">
-      {/* Video */}
-      <video
-        ref={videoRef}
-        className="object-cover h-full w-full"
-        src={video.url}
-        loop
-        muted={false}
-        playsInline
-        onClick={togglePlay}
-      />
+      <AspectRatio ratio={9 / 16} className="w-full">
+        <video
+          ref={videoRef}
+          className="absolute inset-0 object-cover w-full h-full"
+          src={video.url}
+          loop
+          muted={false}
+          playsInline
+          onClick={togglePlay}
+        />
+      </AspectRatio>
 
-      {/* Overlay for controls */}
       <div 
         className="absolute inset-0 flex flex-col justify-between pointer-events-none"
         onClick={togglePlay}
       >
-        {/* Video info */}
         <div className="flex-1"></div>
         
         <div className="p-4 z-10 pointer-events-auto">
@@ -52,7 +51,6 @@ const VideoPlayer = ({ video, isInView }: VideoPlayerProps) => {
         </div>
       </div>
 
-      {/* Right side actions */}
       <div className="absolute right-4 bottom-20 flex flex-col space-y-6 items-center">
         <button 
           className="flex flex-col items-center pointer-events-auto"
@@ -85,12 +83,10 @@ const VideoPlayer = ({ video, isInView }: VideoPlayerProps) => {
         </button>
       </div>
 
-      {/* Progress bar */}
       <div className="video-progress">
         <div className="video-progress-inner" style={{ width: `${progress}%` }}></div>
       </div>
 
-      {/* Play/pause indicator - optional */}
       {!isPlaying && (
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="bg-black bg-opacity-40 rounded-full p-4">
