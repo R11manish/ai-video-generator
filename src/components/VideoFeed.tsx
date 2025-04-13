@@ -1,14 +1,16 @@
+"use client";
 
-import { useRef, useState, useEffect } from 'react';
-import { Video } from '@/types/video';
-import VideoPlayer from './VideoPlayer';
-import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { useRef, useState, useEffect } from "react";
+import { Video } from "@/types/video";
+import VideoPlayer from "./VideoPlayer";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 
 interface VideoFeedProps {
   videos: Video[];
+  onIndexChange?: (index: number) => void;
 }
 
-const VideoFeed = ({ videos }: VideoFeedProps) => {
+const VideoFeed = ({ videos, onIndexChange }: VideoFeedProps) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -18,15 +20,15 @@ const VideoFeed = ({ videos }: VideoFeedProps) => {
   useEffect(() => {
     const setVh = () => {
       const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
     };
 
     setVh();
-    window.addEventListener('resize', setVh);
-    return () => window.removeEventListener('resize', setVh);
+    window.addEventListener("resize", setVh);
+    return () => window.removeEventListener("resize", setVh);
   }, []);
 
-  // Handle scroll navigation
+  // Handle scroll navigation and notify parent of index changes
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -35,12 +37,19 @@ const VideoFeed = ({ videos }: VideoFeedProps) => {
       const scrollTop = container.scrollTop;
       const videoHeight = container.clientHeight;
       const index = Math.round(scrollTop / videoHeight);
-      setCurrentIndex(index);
+
+      if (index !== currentIndex) {
+        setCurrentIndex(index);
+        // Notify parent component about index change
+        if (onIndexChange) {
+          onIndexChange(index);
+        }
+      }
     };
 
-    container.addEventListener('scroll', handleScroll);
-    return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, [currentIndex, onIndexChange]);
 
   // Handle touch events for swipe navigation
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -62,13 +71,13 @@ const VideoFeed = ({ videos }: VideoFeedProps) => {
       // Swipe down, go to previous video
       container.scrollTo({
         top: (currentIndex - 1) * container.clientHeight,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     } else if (isSwipeUp && currentIndex < videos.length - 1 && container) {
       // Swipe up, go to next video
       container.scrollTo({
         top: (currentIndex + 1) * container.clientHeight,
-        behavior: 'smooth'
+        behavior: "smooth",
       });
     }
 
@@ -77,7 +86,7 @@ const VideoFeed = ({ videos }: VideoFeedProps) => {
   };
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="h-screen w-full overflow-y-scroll hide-scrollbar snap-y snap-mandatory"
       onTouchStart={handleTouchStart}
@@ -85,14 +94,8 @@ const VideoFeed = ({ videos }: VideoFeedProps) => {
       onTouchEnd={handleTouchEnd}
     >
       {videos.map((video, index) => (
-        <div 
-          key={video.id} 
-          className="h-full w-full snap-start snap-always"
-        >
-          <VideoPlayer 
-            video={video} 
-            isInView={index === currentIndex}
-          />
+        <div key={video.id} className="h-full w-full snap-start snap-always">
+          <VideoPlayer video={video} isInView={index === currentIndex} />
         </div>
       ))}
     </div>

@@ -1,5 +1,6 @@
+"use client";
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from "react";
 
 interface UseVideoPlayerProps {
   isInView: boolean;
@@ -16,8 +17,8 @@ export const useVideoPlayer = ({ isInView }: UseVideoPlayerProps) => {
     if (!videoElement) return;
 
     if (isInView) {
-      videoElement.play().catch(error => {
-        console.error('Autoplay failed:', error);
+      videoElement.play().catch((error) => {
+        console.error("Autoplay failed:", error);
       });
       setIsPlaying(true);
     } else {
@@ -32,15 +33,16 @@ export const useVideoPlayer = ({ isInView }: UseVideoPlayerProps) => {
 
     const updateProgress = () => {
       if (videoElement.duration) {
-        const percentage = (videoElement.currentTime / videoElement.duration) * 100;
+        const percentage =
+          (videoElement.currentTime / videoElement.duration) * 100;
         setProgress(percentage);
       }
     };
 
-    videoElement.addEventListener('timeupdate', updateProgress);
+    videoElement.addEventListener("timeupdate", updateProgress);
 
     return () => {
-      videoElement.removeEventListener('timeupdate', updateProgress);
+      videoElement.removeEventListener("timeupdate", updateProgress);
     };
   }, []);
 
@@ -52,15 +54,15 @@ export const useVideoPlayer = ({ isInView }: UseVideoPlayerProps) => {
       videoElement.pause();
       setIsPlaying(false);
     } else {
-      videoElement.play().catch(error => {
-        console.error('Play failed:', error);
+      videoElement.play().catch((error) => {
+        console.error("Play failed:", error);
       });
       setIsPlaying(true);
     }
   };
 
   const toggleLike = () => {
-    setIsLiked(prev => !prev);
+    setIsLiked((prev) => !prev);
   };
 
   return {
@@ -69,6 +71,6 @@ export const useVideoPlayer = ({ isInView }: UseVideoPlayerProps) => {
     progress,
     isLiked,
     togglePlay,
-    toggleLike
+    toggleLike,
   };
 };
