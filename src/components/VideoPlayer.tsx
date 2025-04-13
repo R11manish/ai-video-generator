@@ -4,6 +4,7 @@ import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { useVideoPlayer } from "@/hooks/useVideoPlayer";
 import { Video as VideoType } from "@/types/video";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { useState, useEffect } from "react";
 
 interface VideoPlayerProps {
   video: VideoType;
@@ -19,22 +20,28 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
-let hasUserInteracted = false;
-document.addEventListener(
-  "click",
-  () => {
-    hasUserInteracted = true;
-    // Try to unmute any videos that are currently playing
-    document.querySelectorAll("video").forEach((video) => {
-      if (!video.paused) {
-        video.muted = false;
-      }
-    });
-  },
-  { once: true }
-);
-
 const VideoPlayer = ({ video, isInView }: VideoPlayerProps) => {
+  const [hasUserInteracted, setHasUserInteracted] = useState(false);
+
+  useEffect(() => {
+    // This code only runs in the browser
+    const handleUserInteraction = () => {
+      setHasUserInteracted(true);
+      // Try to unmute any videos that are currently playing
+      document.querySelectorAll("video").forEach((video) => {
+        if (!video.paused) {
+          video.muted = false;
+        }
+      });
+    };
+
+    document.addEventListener("click", handleUserInteraction, { once: true });
+
+    return () => {
+      document.removeEventListener("click", handleUserInteraction);
+    };
+  }, []);
+
   const { videoRef, isPlaying, progress, isLiked, togglePlay, toggleLike } =
     useVideoPlayer({
       isInView,
