@@ -17,12 +17,10 @@ export default function Home() {
   const [hasMore, setHasMore] = useState(true);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  // Fetch initial videos
   useEffect(() => {
     fetchVideos();
   }, []);
 
-  // Function to fetch videos
   const fetchVideos = async (key?: DynamoDBKey) => {
     try {
       if (!key) {

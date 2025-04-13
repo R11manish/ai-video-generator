@@ -8,6 +8,7 @@ import {
 } from "@aws-sdk/client-sqs";
 import { sqsClient } from "@/lib/aws-config";
 import { QUEUE_NAME } from "@/lib/constants";
+import { checkRateLimit } from "@/lib/rate-limiter";
 
 interface SQSMessage {
   messageId?: string;
@@ -15,6 +16,11 @@ interface SQSMessage {
   receiptHandle?: string;
 }
 
+// Rate limit configuration
+const VIDEO_GEN_RATE_LIMIT = {
+  maxRequests: 5,
+  windowInSeconds: 60,
+};
 
 export async function sendToQueue(
   messageBody: Record<string, unknown>,
@@ -26,6 +32,23 @@ export async function sendToQueue(
       return {
         success: false,
         message: "Authentication failed. Invalid password.",
+      };
+    }
+
+    // Rate limiting check
+    const identifier = Buffer.from(password).toString("base64");
+    const rateLimitResult = await checkRateLimit({
+      key: "video-gen",
+      identifier,
+      maxRequests: VIDEO_GEN_RATE_LIMIT.maxRequests,
+      windowInSeconds: VIDEO_GEN_RATE_LIMIT.windowInSeconds,
+    });
+
+    // If rate limit exceeded
+    if (!rateLimitResult.success) {
+      return {
+        success: false,
+        message: `Rate limit exceeded. Maximum ${rateLimitResult.limit} requests allowed per ${VIDEO_GEN_RATE_LIMIT.windowInSeconds} seconds. Please try again in ${rateLimitResult.resetIn} seconds.`,
       };
     }
 
@@ -59,7 +82,7 @@ export async function sendToQueue(
 
     return {
       success: true,
-      message: `Message sent successfully. MessageId: ${sendResponse.MessageId}`,
+      message: `Message sent successfully. MessageId: ${sendResponse.MessageId}. Remaining requests: ${rateLimitResult.remaining}.`,
     };
   } catch (error) {
     console.error("Error sending message to SQS:", error);
@@ -87,7 +110,6 @@ export async function receiveFromQueue(
       };
     }
 
-
     const queueUrlResponse = await sqsClient.send(
       new GetQueueUrlCommand({
         QueueName: QUEUE_NAME,
@@ -101,7 +123,6 @@ export async function receiveFromQueue(
       };
     }
 
-   
     const receiveResponse = await sqsClient.send(
       new ReceiveMessageCommand({
         QueueUrl: queueUrlResponse.QueueUrl,
@@ -118,7 +139,6 @@ export async function receiveFromQueue(
         message: "No messages available in the queue.",
       };
     }
-
 
     const parsedMessages = receiveResponse.Messages.map((msg) => {
       try {
@@ -152,13 +172,11 @@ export async function receiveFromQueue(
   }
 }
 
-
 export async function deleteMessage(
   receiptHandle: string | undefined,
   password: string
 ): Promise<{ success: boolean; message: string }> {
   try {
- 
     if (!receiptHandle) {
       return {
         success: false,
@@ -166,7 +184,6 @@ export async function deleteMessage(
       };
     }
 
-   
     if (password !== process.env.ADMIN_PASSWORD) {
       return {
         success: false,
@@ -174,7 +191,6 @@ export async function deleteMessage(
       };
     }
 
- 
     const queueUrlResponse = await sqsClient.send(
       new GetQueueUrlCommand({
         QueueName: QUEUE_NAME,
@@ -188,7 +204,6 @@ export async function deleteMessage(
       };
     }
 
-   
     await sqsClient.send(
       new DeleteMessageCommand({
         QueueUrl: queueUrlResponse.QueueUrl,
