@@ -4,9 +4,13 @@ import { useState, useRef, useEffect } from "react";
 
 interface UseVideoPlayerProps {
   isInView: boolean;
+  hasUserInteracted?: boolean;
 }
 
-export const useVideoPlayer = ({ isInView }: UseVideoPlayerProps) => {
+export const useVideoPlayer = ({
+  isInView,
+  hasUserInteracted = false,
+}: UseVideoPlayerProps) => {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [progress, setProgress] = useState(0);
