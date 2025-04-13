@@ -37,10 +37,10 @@ export async function getVideos(
         return {
           id: unmarshalled.id || "",
           url: unmarshalled.url || "",
-          caption: unmarshalled.title || "", // Map 'title' to 'caption'
-          username: `@user${unmarshalled.id.slice(0, 4)}`, // Create a username from the ID
-          likes: Math.floor(Math.random() * 5000), // Add random likes
-          comments: Math.floor(Math.random() * 500), // Add random comments
+          caption: unmarshalled.title || "", 
+          username: `@user${unmarshalled.id.slice(0, 4)}`, 
+          likes: Math.floor(Math.random() * 5000), 
+          comments: Math.floor(Math.random() * 500),
         } as Video;
       }) || [];
 

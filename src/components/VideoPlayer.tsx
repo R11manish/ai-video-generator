@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
 import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { useVideoPlayer } from "@/hooks/useVideoPlayer";
 import { Video as VideoType } from "@/types/video";
@@ -20,10 +19,26 @@ const formatNumber = (num: number): string => {
   return num.toString();
 };
 
+let hasUserInteracted = false;
+document.addEventListener(
+  "click",
+  () => {
+    hasUserInteracted = true;
+    // Try to unmute any videos that are currently playing
+    document.querySelectorAll("video").forEach((video) => {
+      if (!video.paused) {
+        video.muted = false;
+      }
+    });
+  },
+  { once: true }
+);
+
 const VideoPlayer = ({ video, isInView }: VideoPlayerProps) => {
   const { videoRef, isPlaying, progress, isLiked, togglePlay, toggleLike } =
     useVideoPlayer({
       isInView,
+      hasUserInteracted,
     });
 
   return (
@@ -34,8 +49,9 @@ const VideoPlayer = ({ video, isInView }: VideoPlayerProps) => {
           className="absolute inset-0 object-cover w-full h-full"
           src={video.url}
           loop
-          muted={false}
+          muted={!hasUserInteracted}
           playsInline
+          autoPlay={isInView}
           onClick={togglePlay}
         />
       </AspectRatio>
@@ -111,6 +127,14 @@ const VideoPlayer = ({ video, isInView }: VideoPlayerProps) => {
             >
               <path d="M8 5v14l11-7z" />
             </svg>
+          </div>
+        </div>
+      )}
+
+      {!hasUserInteracted && isInView && (
+        <div className="absolute bottom-32 left-0 right-0 flex justify-center">
+          <div className="bg-black bg-opacity-50 text-white px-4 py-2 rounded-full text-sm animate-pulse">
+            Click anywhere to enable sound
           </div>
         </div>
       )}
