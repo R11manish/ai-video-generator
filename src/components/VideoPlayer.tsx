@@ -24,10 +24,8 @@ const VideoPlayer = ({ video, isInView }: VideoPlayerProps) => {
   const [hasUserInteracted, setHasUserInteracted] = useState(false);
 
   useEffect(() => {
-    // This code only runs in the browser
     const handleUserInteraction = () => {
       setHasUserInteracted(true);
-      // Try to unmute any videos that are currently playing
       document.querySelectorAll("video").forEach((video) => {
         if (!video.paused) {
           video.muted = false;

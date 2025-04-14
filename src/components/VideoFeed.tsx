@@ -28,7 +28,6 @@ const VideoFeed = ({ videos, onIndexChange }: VideoFeedProps) => {
     return () => window.removeEventListener("resize", setVh);
   }, []);
 
-  // Handle scroll navigation with improved detection
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -42,24 +41,20 @@ const VideoFeed = ({ videos, onIndexChange }: VideoFeedProps) => {
         clearTimeout(scrollTimeoutRef.current);
       }
 
-      // Use requestAnimationFrame for better performance
       requestAnimationFrame(() => {
         const scrollTop = container.scrollTop;
         const videoHeight = container.clientHeight;
 
-        // Calculate index with more precision
         const index = Math.round(scrollTop / videoHeight);
         const normalizedIndex = Math.max(0, Math.min(index, videos.length - 1));
 
         if (normalizedIndex !== currentIndex) {
           setCurrentIndex(normalizedIndex);
-          // Notify parent component about index change
           if (onIndexChange) {
             onIndexChange(normalizedIndex);
           }
         }
 
-        // Set a timeout to indicate scrolling has stopped
         scrollTimeoutRef.current = setTimeout(() => {
           setIsScrolling(false);
         }, 150);
@@ -100,13 +95,11 @@ const VideoFeed = ({ videos, onIndexChange }: VideoFeedProps) => {
     const container = containerRef.current;
 
     if (isSwipeDown && currentIndex > 0 && container) {
-      // Swipe down, go to previous video
       container.scrollTo({
         top: (currentIndex - 1) * container.clientHeight,
         behavior: "smooth",
       });
     } else if (isSwipeUp && currentIndex < videos.length - 1 && container) {
-      // Swipe up, go to next video
       container.scrollTo({
         top: (currentIndex + 1) * container.clientHeight,
         behavior: "smooth",
@@ -117,7 +110,6 @@ const VideoFeed = ({ videos, onIndexChange }: VideoFeedProps) => {
     setTouchEnd(null);
   };
 
-  // Preload the next video for smoother transitions
   useEffect(() => {
     if (currentIndex < videos.length - 1) {
       const nextVideoUrl = videos[currentIndex + 1].url;
@@ -133,8 +125,7 @@ const VideoFeed = ({ videos, onIndexChange }: VideoFeedProps) => {
     }
   }, [currentIndex, videos]);
 
-  // Explicitly scroll to the current video when index changes
-  // This ensures perfect alignment after user interaction
+ 
   useEffect(() => {
     const container = containerRef.current;
     if (!container || isScrolling) return;

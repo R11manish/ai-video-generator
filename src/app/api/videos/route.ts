@@ -11,12 +11,10 @@ type DynamoDBKey = Record<string, AttributeValue>;
 
 export async function GET(request: NextRequest) {
   try {
-    // Get pagination parameters from query string
     const searchParams = request.nextUrl.searchParams;
     const limitParam = searchParams.get("limit");
     const limit = limitParam ? parseInt(limitParam, 10) : 5;
 
-    // Get lastEvaluatedKey from query if it exists
     const lastKeyParam = searchParams.get("lastKey");
     let lastEvaluatedKey: DynamoDBKey | undefined;
 
@@ -30,7 +28,6 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Scan the ai_videos table with pagination
     const scanParams: ScanCommandInput = {
       TableName: "ai_videos",
       Limit: limit,
@@ -42,7 +39,6 @@ export async function GET(request: NextRequest) {
 
     const response = await docClient.send(new ScanCommand(scanParams));
 
-    // Map the DynamoDB items to Video objects
     const videos =
       response.Items?.map((item) => {
         const unmarshalled = unmarshall(item);

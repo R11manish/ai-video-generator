@@ -36,17 +36,12 @@ export default function Home() {
         if (!key) {
           setVideos(result.videos);
         } else {
-          // If we're fetching more videos, append them
           setVideos((prev) => [...prev, ...result.videos]);
         }
 
-        // Save the last key for pagination
         setLastEvaluatedKey(result.lastEvaluatedKey);
-
-        // Check if there are more videos to load
         setHasMore(!!result.lastEvaluatedKey);
       } else if (!key) {
-        // If this is the initial load and no videos were found, use mock videos
         setVideos(mockVideos);
         setError("Using mock videos as fallback");
         setHasMore(false);
@@ -54,7 +49,6 @@ export default function Home() {
     } catch (err) {
       console.error("Failed to fetch videos:", err);
       if (!key) {
-        // Only use fallback on initial load
         setError("Failed to fetch videos. Using mock videos as fallback.");
         setVideos(mockVideos);
       }
@@ -67,9 +61,7 @@ export default function Home() {
     }
   };
 
-  // Load more videos when user approaches the end
   useEffect(() => {
-    // If we're 2 videos away from the end and we have more to load
     if (
       currentIndex >= videos.length - 2 &&
       hasMore &&
@@ -80,7 +72,6 @@ export default function Home() {
     }
   }, [currentIndex, videos.length, hasMore, loadingMore, lastEvaluatedKey]);
 
-  // Forcing dark mode for TikTok-like appearance
   useEffect(() => {
     document.documentElement.classList.add("dark");
     return () => {
@@ -88,7 +79,6 @@ export default function Home() {
     };
   }, []);
 
-  // Handle current video index change
   const handleIndexChange = (index: number) => {
     setCurrentIndex(index);
   };
