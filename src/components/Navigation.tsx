@@ -8,7 +8,7 @@ const Navigation: React.FC = () => {
     <nav className="border-b bg-background p-4 sticky top-0 z-50">
       <div className="container flex justify-between items-center">
         <Link href="/" className="text-xl font-bold">
-          EssentiallySports Shorts
+          InstantSports Shorts
         </Link>
 
         <div className="flex gap-4">
