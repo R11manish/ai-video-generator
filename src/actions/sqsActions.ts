@@ -16,10 +16,9 @@ interface SQSMessage {
   receiptHandle?: string;
 }
 
-// Rate limit configuration
 const VIDEO_GEN_RATE_LIMIT = {
-  maxRequests: 5,
-  windowInSeconds: 60,
+  maxRequests: 10,
+  windowInSeconds: 7200,
 };
 
 export async function sendToQueue(
@@ -27,7 +26,6 @@ export async function sendToQueue(
   password: string
 ): Promise<{ success: boolean; message: string }> {
   try {
-    // Verify password
     if (password !== process.env.ADMIN_PASSWORD) {
       return {
         success: false,
@@ -35,7 +33,6 @@ export async function sendToQueue(
       };
     }
 
-    // Rate limiting check
     const identifier = Buffer.from(password).toString("base64");
     const rateLimitResult = await checkRateLimit({
       key: "video-gen",
@@ -95,9 +92,7 @@ export async function sendToQueue(
   }
 }
 
-/**
- * Retrieves messages from the SQS queue
- */
+
 export async function receiveFromQueue(
   password: string
 ): Promise<{ success: boolean; messages?: SQSMessage[]; message: string }> {
